@@ -50,6 +50,8 @@
 	<string>Foto maken bij elke hole</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Foto opslaan in je fotobibliotheek</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Foto opslaan in je fotobibliotheek</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

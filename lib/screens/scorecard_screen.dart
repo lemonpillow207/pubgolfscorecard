@@ -129,22 +129,25 @@ class _TeamScorecard extends StatelessWidget {
   Widget build(BuildContext context) {
     final team = context.watch<GameProvider>().teams.firstWhere((t) => t.id == teamId);
 
-    return Column(
-      children: [
-        _ScorecardSummaryBar(team: team),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-            itemCount: 18,
-            itemBuilder: (_, i) => _HoleRow(
-              key: ValueKey('${teamId}_hole_$i'),
-              teamId: teamId,
-              hole: i,
-              initialScore: team.scores[i],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Column(
+        children: [
+          _ScorecardSummaryBar(team: team),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              itemCount: 18,
+              itemBuilder: (_, i) => _HoleRow(
+                key: ValueKey('${teamId}_hole_$i'),
+                teamId: teamId,
+                hole: i,
+                initialScore: team.scores[i],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -254,20 +257,49 @@ class _HoleRowState extends State<_HoleRow> {
   }
 
   Future<void> _takePhoto(BuildContext context, int hole) async {
-    final picker = ImagePicker();
-    final photo = await picker.pickImage(source: ImageSource.camera);
-    if (photo == null) return;
-    await Gal.putImage(photo.path, album: 'Pub Golf');
-    if (context.mounted) {
-      context.read<GameProvider>().markPhotoTaken(hole);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Foto opgeslagen in je fotobibliotheek!',
-              style: GoogleFonts.poppins()),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    try {
+      // Request gallery permission first
+      final hasAccess = await Gal.requestAccess(toAlbum: true);
+      if (!hasAccess) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Geen toegang tot fotobibliotheek.',
+                  style: GoogleFonts.poppins()),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      final picker = ImagePicker();
+      final photo = await picker.pickImage(source: ImageSource.camera);
+      if (photo == null) return;
+
+      await Gal.putImage(photo.path, album: 'Pub Golf');
+
+      if (context.mounted) {
+        context.read<GameProvider>().markPhotoTaken(hole);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Foto opgeslagen in je fotobibliotheek!',
+                style: GoogleFonts.poppins()),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Foto opslaan mislukt: $e',
+                style: GoogleFonts.poppins()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -327,10 +359,12 @@ class _HoleRowState extends State<_HoleRow> {
               child: TextField(
                 controller: _ctrl,
                 keyboardType: const TextInputType.numberWithOptions(signed: false),
+                textInputAction: TextInputAction.done,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(2),
                 ],
+                onSubmitted: (_) => FocusScope.of(context).unfocus(),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                   fontSize: 20,
