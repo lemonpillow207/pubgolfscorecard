@@ -9,6 +9,37 @@ import '../widgets/add_team_dialog.dart';
 class TeamsScreen extends StatelessWidget {
   const TeamsScreen({super.key});
 
+  void _confirmReset(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Alles resetten?',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+          'Dit verwijdert alle teams, scores, antwoorden en foto-states. Dit kan niet ongedaan worden gemaakt.',
+          style: GoogleFonts.poppins(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Annuleren',
+                style: GoogleFonts.poppins(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<GameProvider>().reset();
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text('Reset',
+                style: GoogleFonts.poppins(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final teams = context.watch<GameProvider>().teams;
@@ -25,6 +56,17 @@ class TeamsScreen extends StatelessWidget {
             const Text('Pub Golf'),
           ],
         ),
+        actions: [
+          if (teams.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                icon: const Icon(Icons.restart_alt, color: Colors.white),
+                tooltip: 'Reset',
+                onPressed: () => _confirmReset(context),
+              ),
+            ),
+        ],
       ),
       body: teams.isEmpty
           ? _EmptyTeamsState()

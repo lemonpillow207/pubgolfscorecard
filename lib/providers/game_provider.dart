@@ -44,6 +44,15 @@ class GameProvider extends ChangeNotifier {
     _save();
   }
 
+  Future<void> reset() async {
+    _teams.clear();
+    for (int i = 0; i < 18; i++) _photosTaken[i] = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_key);
+    await prefs.remove(_photosKey);
+    notifyListeners();
+  }
+
   void addTeam(String name, List<String> playerNames) {
     _teams.add(Team(
       id: '${DateTime.now().millisecondsSinceEpoch}_${_teams.length}',
