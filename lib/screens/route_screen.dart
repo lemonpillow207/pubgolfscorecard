@@ -28,7 +28,7 @@ const List<PubStop> _stops = [
   PubStop(name: 'Hole 14 - Café Luxembourg', address: '',mapsUrl: 'https://maps.app.goo.gl/cP8g68qw7EtgBysh9'),
   PubStop(name: 'Hole 15 - Brabantse aap', address: '',mapsUrl: 'https://maps.app.goo.gl/vuRag445Jk2FFoCx7'),
   PubStop(name: 'Hole 16 - Satellite SportsCafé', address: '',mapsUrl: 'https://maps.app.goo.gl/UovGKVHAmHhqGQtB7'),
-  PubStop(name: 'Hole 17 - Bar Americain', address: '',mapsUrl: 'https://maps.app.goo.gl/3gHqz3m4dGmCherdA4'),
+  PubStop(name: 'Hole 17 - Bar Americain', address: '',mapsUrl: 'https://maps.app.goo.gl/zLLppm8jgs3newgr9'),
   PubStop(name: 'Hole 18 - Bar Twenty Two', address: '',mapsUrl: 'https://maps.app.goo.gl/soYLGduoZ5UrKNvt7'),
 ];
 

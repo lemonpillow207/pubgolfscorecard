@@ -3,6 +3,8 @@ import '../main.dart';
 import 'teams_screen.dart';
 import 'scorecard_screen.dart';
 import 'route_screen.dart';
+import 'questions_screen.dart';
+import 'powerups_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
     TeamsScreen(),
     ScorecardScreen(),
     RouteScreen(),
+    QuestionsScreen(),
+    PowerupsScreen(),
   ];
 
   @override
@@ -47,6 +51,16 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.map_outlined),
             selectedIcon: Icon(Icons.map, color: kOrange),
             label: 'Route',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.quiz_outlined),
+            selectedIcon: Icon(Icons.quiz, color: kOrange),
+            label: 'Vragen',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bolt_outlined),
+            selectedIcon: Icon(Icons.bolt, color: kOrange),
+            label: 'Powerups',
           ),
         ],
       ),

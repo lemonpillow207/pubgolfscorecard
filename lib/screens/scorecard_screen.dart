@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:gal/gal.dart';
 import '../main.dart';
 import '../providers/game_provider.dart';
 import '../models/team.dart';
@@ -250,6 +253,24 @@ class _HoleRowState extends State<_HoleRow> {
     super.dispose();
   }
 
+  Future<void> _takePhoto(BuildContext context, int hole) async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.camera);
+    if (photo == null) return;
+    await Gal.putImage(photo.path, album: 'Pub Golf');
+    if (context.mounted) {
+      context.read<GameProvider>().markPhotoTaken(hole);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Foto opgeslagen in je fotobibliotheek!',
+              style: GoogleFonts.poppins()),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<GameProvider>();
@@ -258,6 +279,7 @@ class _HoleRowState extends State<_HoleRow> {
     if (teamIdx == -1) return const SizedBox.shrink();
     final team = teams[teamIdx];
     final isDouble = team.doubleStrokes[widget.hole];
+    final photoTaken = provider.photosTaken[widget.hole];
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -344,6 +366,37 @@ class _HoleRowState extends State<_HoleRow> {
                         int.tryParse(val),
                       );
                 },
+              ),
+            ),
+            if (!kIsWeb) const SizedBox(width: 8),
+            // Camera button (iOS/Android only)
+            if (!kIsWeb) GestureDetector(
+              onTap: photoTaken ? null : () => _takePhoto(context, widget.hole),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: photoTaken ? Colors.green.shade50 : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      photoTaken ? Icons.check_circle : Icons.camera_alt,
+                      size: 14,
+                      color: photoTaken ? Colors.green : Colors.black38,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      photoTaken ? 'OK' : 'Foto',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: photoTaken ? Colors.green : Colors.black38,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 8),

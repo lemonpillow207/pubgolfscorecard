@@ -6,10 +6,13 @@ import 'screens/home_screen.dart';
 
 const kOrange = Color(0xFFFF6500);
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final provider = GameProvider();
+  await provider.load();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => GameProvider(),
+    ChangeNotifierProvider.value(
+      value: provider,
       child: const PubGolfApp(),
     ),
   );
